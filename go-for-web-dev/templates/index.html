@@ -1,6 +1,11 @@
 <html>
   <head>
-
+    <style>
+      #search-result tr:hover {
+        background-color: lightgrey;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
   <form id="search-form" onsubmit="return false">
@@ -36,6 +41,10 @@
           parsed.forEach(result => {
             var row = $(`<tr><td> ${result.Title} </td><td>${result.Author}</td><td>${result.Year}</td><td>${result.ID}</td></tr>`)
             searchResults.append(row)
+            $.ajax({
+              url: "/books/add?id=" + result.ID,
+              method: "GET"
+            })
           });
         }
       })
