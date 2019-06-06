@@ -4,19 +4,17 @@ import (
 	"database/sql"
 	"encoding/json"
 	"encoding/xml"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
 	"github.com/codegangsta/negroni"
-
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/yosssi/ace"
 )
 
 type Page struct {
-	Name     string
-	DBStatus bool
+	Books []Book
 }
 
 type SearchResult struct {
@@ -40,6 +38,13 @@ type ClassifyBookResponse struct {
 	} `xml:"recomendations>ddc>mostPopular"`
 }
 
+type Book struct {
+	PK             int
+	Title          string
+	Author         string
+	Classification string
+}
+
 var db *sql.DB
 
 func verifyDBConnectionMiddelWare(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
@@ -52,19 +57,28 @@ func verifyDBConnectionMiddelWare(w http.ResponseWriter, r *http.Request, next h
 }
 func main() {
 
-	templates := template.Must(template.ParseFiles("templates/index.html"))
-
 	db, _ = sql.Open("sqlite3", "dev.db")
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		p := Page{Name: "Gopher"}
-		if name := r.FormValue("name"); name != "" {
-			p.Name = name
+
+		templates, err := ace.Load("templates/index", "", nil)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		if err := templates.ExecuteTemplate(w, "index.html", p); err != nil {
+		p := Page{Books: []Book{}}
+
+		rows, _ := db.Query("select pk, title, author, classification from books")
+
+		for rows.Next() {
+			var b Book
+			rows.Scan(&b.PK, &b.Title, &b.Author, &b.Classification)
+			p.Books = append(p.Books, b)
+		}
+		if err := templates.Execute(w, p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
