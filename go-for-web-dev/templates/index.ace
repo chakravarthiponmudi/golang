@@ -30,7 +30,7 @@ html
             th width="40%" Tittle
             th width="30%" Author
             th width="30%" Classification
-          tbody
+          tbody id="view-result"
             {{range .Books}}
               tr  
                 td {{.Title}}
@@ -63,7 +63,14 @@ html
               row.on('click', function () {
                 $.ajax({
                   url: "/books/add?id=" + result.ID,
-                  method: "GET"
+                  method: "GET",
+                  success: function(result) {
+                    var book = JSON.parse(result)
+                    if (!book) {
+                      return
+                    }
+                    $("#view-result").append(`<tr><td> ${book.Title} </td><td>${book.Author}</td><td>${book.Classification}</td></tr>`)
+                  }
                 })
               });
             });
