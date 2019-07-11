@@ -6,10 +6,30 @@ html
         background-color: lightgrey;
         cursor: pointer;
       }
+      #page-switcher {
+        width:100%;
+        text-align: center;
+      }
+      #page-switcher button {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 1em;
+        padding: .3em;
+      }
+      #search-page {
+        display: none;
+      }
+      .delete-btn {
+        color: white;
+        background-color: #d9534f;
+        border-color: #d43f3a;
+        border-radius: 8px;
+      }
     
   body
-    button onClick=showViewPage() View 
-    button onClick=showSearchPage() Search
+    div#page-switcher
+      button onClick=showViewPage() View 
+      button onClick=showSearchPage() Search
     div id="search-page" style="display:none"
       form id="search-form" onsubmit="return false"
         input name="search"
@@ -29,16 +49,28 @@ html
           tr style="text-align: left;"
             th width="40%" Tittle
             th width="30%" Author
-            th width="30%" Classification
+            th width="20%" Classification
+            th width=10%
           tbody id="view-result"
             {{range .Books}}
-              tr  
+              tr id="book-row-{{.PK}}"
                 td {{.Title}}
                 td {{.Author}}
                 td {{.Classification}}
+                td
+                  button.delete-btn onclick="deleteBook({{.PK}})" Delete
             {{end}}
     script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"
     = javascript
+      function deleteBook(pk) {
+        $.ajax({
+          method: "GET",
+          url: "/books/delete?pk=" + pk,
+          success: function() {
+            $("#book-row-" + pk).remove();
+          }
+        });
+      }
       function showViewPage() {
         $("#search-page").hide()
         $("#view-page").show()
@@ -69,7 +101,7 @@ html
                     if (!book) {
                       return
                     }
-                    $("#view-result").append(`<tr><td> ${book.Title} </td><td>${book.Author}</td><td>${book.Classification}</td></tr>`)
+                    $("#view-result").append(`<tr><td> ${book.Title} </td><td>${book.Author}</td><td>${book.Classification}</td><td><button class='delete-btn' onclick='deleteBook(" + book.PK + ")'>Delete</button></td></tr>`)
                   }
                 })
               });
