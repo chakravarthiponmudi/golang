@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/chakra/ratelimiter/library"
 	"github.com/chakra/ratelimiter/service/registration"
 
 	"github.com/chakra/ratelimiter/controller"
@@ -52,8 +53,12 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	c := createContract(params.Get("user"), params.Get("group"), int64(allowedRequest), int16(window))
 
-	registration.RegisterAPI(*c)
-	fmt.Fprintf(w, "Successfully registered")
+	if registration.RegisterAPI(*c) {
+		fmt.Fprintf(w, "Successfully registered")
+	} else {
+		fmt.Fprintf(w, "Registration Failed")
+	}
+
 }
 
 func createServer() *http.Server {
@@ -64,9 +69,38 @@ func createServer() *http.Server {
 	return s
 }
 
+func getContracts(w http.ResponseWriter, r *http.Request) {
+	registration.GetContractByName("Athena")
+
+}
+
+func addApi(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	clientName := r.Form.Get("clientname")
+	apipath := r.Form.Get("path")
+	clientgroup := registration.APIGroup(r.Form.Get("clientgroup"))
+
+	contract, err := registration.GetContractByNameAndGroup(clientName, clientgroup)
+
+	if err != nil {
+		fmt.Fprintf(w, "No Contract found")
+		return
+	}
+
+	if registration.AddApi(apipath, contract) {
+		fmt.Fprintf(w, "Adding API done")
+	} else {
+		fmt.Fprintf(w, "Adding API failed")
+	}
+
+}
+
 func main() {
+	library.SetupConnection()
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/contract", registerHandler)
+	http.HandleFunc("/contract/user", getContracts)
+	http.HandleFunc("/api", addApi)
 
 	server := createServer()
 	log.Fatal(server.ListenAndServe())

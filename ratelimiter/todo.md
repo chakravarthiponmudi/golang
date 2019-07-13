@@ -20,6 +20,9 @@ I am now focusing on the registration side of the API.
 
 Created the database via docker and made a sure that the following are working
 
+I have the endpoints for adding the contract and the api's but with out proper error handling.
+# **Now i have to setup the error handling processing and also should focus on the test case writing**
+
 ```
  docker run -d -p 80:80 \
 -e "PGADMIN_DEFAULT_PASSWORD=password" \
