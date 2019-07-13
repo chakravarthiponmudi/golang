@@ -1,0 +1,21 @@
+version: '3.2'
+services:
+  ratelimitdb:
+    container_name: 'ratelimitdb'
+    restart: 'always'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      - '15432:5432'
+    environment:
+      - "FILLA_DB_USER=local"
+      - "FILLA_DB_PASSWORD=local@007"
+      - "FILLA_DB_DATABASE=ratelimiter"
+      - "POSTGRES_PASSWORD=password"
+    build: './db'
+    networks:
+      infranet:
+        aliases:
+          - 'postgres'
+networks:
+  infranet:
