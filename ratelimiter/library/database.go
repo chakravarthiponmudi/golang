@@ -18,12 +18,16 @@ const (
 
 var db *sql.DB
 
-func SetupConnection() *sql.DB {
+func SetupDSN() string {
 	var psqlinfo = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
+	return psqlinfo
+}
+
+func SetupConnection() *sql.DB {
 
 	var err error
-	db, err = sql.Open("postgres", psqlinfo)
+	db, err = sql.Open("postgres", SetupDSN())
 
 	if err != nil {
 		log.Panic(err)

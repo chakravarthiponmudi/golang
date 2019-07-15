@@ -2,37 +2,25 @@ package registration
 
 import "fmt"
 
-type APIGroup string
-
-type Contract struct {
-	id             int64
-	User           string
-	Group          APIGroup
-	AllowedRequest int64
-	Window         int16
-}
-
-type API struct {
-	contract Contract
-	apipath  string
-}
-
-func RegisterAPI(c Contract) bool {
-	fmt.Printf("Register the user %s under the group %s with the limit %d per %d minute(s)", c.User, c.Group, c.AllowedRequest, c.Window)
+func RegisterContract(c ContractCUD) bool {
+	contract := c.getObject()
+	fmt.Printf("Register the user %s under the group %s with the limit %d per %d minute(s)\n", contract.User, contract.Group, contract.AllowedRequest, contract.Window)
 	return c.addContract()
 }
 
-func GetContractByName(user string) {
+func GetContractByName(contracts ContractsGetter, user string) {
 
-	contracts, _ := getContractsByUser(user)
+	contracts.getContractsByUser(user)
 	fmt.Println("contracts", contracts)
 }
 
-func GetContractByNameAndGroup(user string, group APIGroup) (Contract, error) {
-	contract, err := getContractByNameAndGroup(user, group)
-	return contract, err
+func GetContractByNameAndGroup(c ContractGetter, user string, group APIGroup) error {
+
+	err := c.getContractByNameAndGroup(user, group)
+
+	return err
 }
 
-func AddApi(api string, contract Contract) bool {
+func AddApi(api string, contract ContractCUD) bool {
 	return contract.addAPI(api)
 }

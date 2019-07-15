@@ -36,3 +36,9 @@ bck-i-search: dpage_
 
 This is the tool that i used for golang dependency management
 
+###GORC
+gorc is a command that helps running the go test command recursively inside the subfolders. it seems that go test doesn't run the test cases which are present inside the sub folders. **CHECK**
+
+###TESTIFY
+
+Testify is a like MOCHA. which allows you to do some tearup and teardown.... good to have feature.

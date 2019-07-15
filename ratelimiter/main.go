@@ -53,7 +53,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	c := createContract(params.Get("user"), params.Get("group"), int64(allowedRequest), int16(window))
 
-	if registration.RegisterAPI(*c) {
+	if registration.RegisterContract(*c) {
 		fmt.Fprintf(w, "Successfully registered")
 	} else {
 		fmt.Fprintf(w, "Registration Failed")
@@ -70,7 +70,8 @@ func createServer() *http.Server {
 }
 
 func getContracts(w http.ResponseWriter, r *http.Request) {
-	registration.GetContractByName("Athena")
+	contract := new(registration.Contracts)
+	registration.GetContractByName(contract, "Athena")
 
 }
 
@@ -80,7 +81,11 @@ func addApi(w http.ResponseWriter, r *http.Request) {
 	apipath := r.Form.Get("path")
 	clientgroup := registration.APIGroup(r.Form.Get("clientgroup"))
 
-	contract, err := registration.GetContractByNameAndGroup(clientName, clientgroup)
+	var (
+		contract = new(registration.Contract)
+		err      error
+	)
+	err = registration.GetContractByNameAndGroup(contract, clientName, clientgroup)
 
 	if err != nil {
 		fmt.Fprintf(w, "No Contract found")

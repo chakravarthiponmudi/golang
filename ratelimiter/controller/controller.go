@@ -12,9 +12,9 @@ func buildContract() *registration.Contract {
 	return c
 }
 
-//RegisterAPI - Allows the registration of the API
-func RegisterAPI(url string) {
+//RegisterContract - Allows the registration of the API
+func RegisterContract(url string) {
 
 	c := buildContract()
-	registration.RegisterAPI(*c)
+	registration.RegisterContract(c)
 }

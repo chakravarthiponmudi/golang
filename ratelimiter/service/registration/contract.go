@@ -7,6 +7,43 @@ import (
 	"github.com/chakra/ratelimiter/library"
 )
 
+type APIGroup string
+
+type Contract struct {
+	id             int64
+	User           string
+	Group          APIGroup
+	AllowedRequest int64
+	Window         int16
+}
+
+type Contracts []Contract
+
+type API struct {
+	contract Contract
+	apipath  string
+}
+
+type ContractCUD interface {
+	addContract() bool
+	deleteContract() bool
+	updateContract() bool
+	addAPI(apipath string) bool
+
+	getObject() Contract
+}
+
+type ContractGetter interface {
+	getContractByNameAndGroup(user string, group APIGroup) error
+}
+
+type ContractsGetter interface {
+	getContractsByUser(user string) error
+}
+
+func (c Contract) getObject() Contract {
+	return c
+}
 func (c Contract) addContract() bool {
 	sqlStatement := `
 	INSERT INTO contract (clientname, clientgroup,allowedlimit, windowinminutes)
@@ -23,50 +60,53 @@ func (c Contract) addContract() bool {
 	return true
 }
 
-func getContractsByUser(user string) ([]Contract, error) {
-	sqlStatement := `
-	SELECT contractid, clientname, clientgroup,allowedlimit, windowinminutes FROM contract where clientname = $1
-	`
-	rows, err := library.GetDBConnection().Query(sqlStatement, user)
+func (c Contract) deleteContract() bool {
+	sqlStatement := `DELETE FROM contract where contractid = $1`
+
+	_, err := library.GetDBConnection().Exec(sqlStatement, c.id)
 
 	if err != nil {
-		log.Println("Selection of the data from contract failed", err)
-		return nil, err
+		log.Println("Deletion of a contract failed", err)
+		return false
 	}
 
-	defer rows.Close()
-
-	var contracts []Contract
-	for rows.Next() {
-		var c Contract
-		err = rows.Scan(&c.id, &c.User, &c.Group, &c.AllowedRequest, &c.Window)
-		contracts = append(contracts, c)
-	}
-
-	err = rows.Err()
-	if err != nil {
-		log.Println("Iteration of the data from contract failed", err)
-		return nil, err
-	}
-	return contracts, nil
+	return true
 }
 
-func getContractByNameAndGroup(user string, group APIGroup) (Contract, error) {
+func (c Contract) updateContract() bool {
+	sqlStatement := `
+	UPDATE contract SET clientname = $1, 
+	clientgroup = $2,
+	allowedlimit= $3,
+	windowinminutes = $4
+	where contract
+	`
+
+	_, err := library.GetDBConnection().Exec(sqlStatement, c.User, c.Group, c.AllowedRequest, c.Window)
+
+	if err != nil {
+		log.Println("update of a contract failed", err)
+		return false
+	}
+
+	return true
+}
+
+func (c *Contract) getContractByNameAndGroup(user string, group APIGroup) error {
 	sqlStatement := `
 	SELECT contractid, clientname, clientgroup,allowedlimit, windowinminutes FROM contract where clientname = $1 and clientgroup = $2
 	`
 
 	row := library.GetDBConnection().QueryRow(sqlStatement, user, group)
-	var c Contract
 	switch err := row.Scan(&c.id, &c.User, &c.Group, &c.AllowedRequest, &c.Window); err {
 	case sql.ErrNoRows:
 		log.Println("No Rows found")
-		return c, err
+		return err
 	case nil:
-		return c, nil
+		return nil
 	default:
 		log.Panic("getContractByNameAndGroup", err)
-		return c, err
+		return err
 	}
 }
 
@@ -83,4 +123,33 @@ func (c Contract) addAPI(apipath string) bool {
 	}
 
 	return true
+}
+
+func (c *Contracts) getContractsByUser(user string) error {
+	sqlStatement := `
+	SELECT contractid, clientname, clientgroup,allowedlimit, windowinminutes FROM contract where clientname = $1
+	`
+	rows, err := library.GetDBConnection().Query(sqlStatement, user)
+
+	if err != nil {
+		log.Println("Selection of the data from contract failed", err)
+		return err
+	}
+
+	defer rows.Close()
+
+	var contracts []Contract
+	for rows.Next() {
+		var c Contract
+		err = rows.Scan(&c.id, &c.User, &c.Group, &c.AllowedRequest, &c.Window)
+		contracts = append(contracts, c)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Println("Iteration of the data from contract failed", err)
+		return err
+	}
+	*c = contracts
+	return nil
 }
