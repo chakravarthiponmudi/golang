@@ -22,18 +22,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createContract(user string, group string, allowedRequest int64, window int16) *registration.Contract {
-	var apigroup = registration.APIGroup(group)
-
-	c := &registration.Contract{
-		User:           user,
-		Group:          apigroup,
-		AllowedRequest: allowedRequest,
-		Window:         window,
-	}
-	return c
-}
-
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
@@ -51,9 +39,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Bad input yet to send the proper code")
 		return
 	}
-	c := createContract(params.Get("user"), params.Get("group"), int64(allowedRequest), int16(window))
+	c := registration.CreateContract(params.Get("user"), params.Get("group"), int64(allowedRequest), int16(window))
 
-	if registration.RegisterContract(*c) {
+	if registration.RegisterContract(c) {
 		fmt.Fprintf(w, "Successfully registered")
 	} else {
 		fmt.Fprintf(w, "Registration Failed")

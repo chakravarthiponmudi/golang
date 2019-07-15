@@ -2,6 +2,18 @@ package registration
 
 import "fmt"
 
+func CreateContract(user string, group string, allowedRequest int64, window int16) *Contract {
+	var apigroup = APIGroup(group)
+
+	c := &Contract{
+		User:           user,
+		Group:          apigroup,
+		AllowedRequest: allowedRequest,
+		Window:         window,
+	}
+	return c
+}
+
 func RegisterContract(c ContractCUD) bool {
 	contract := c.getObject()
 	fmt.Printf("Register the user %s under the group %s with the limit %d per %d minute(s)\n", contract.User, contract.Group, contract.AllowedRequest, contract.Window)

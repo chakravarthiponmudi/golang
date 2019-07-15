@@ -30,7 +30,7 @@ type ContractCUD interface {
 	updateContract() bool
 	addAPI(apipath string) bool
 
-	getObject() Contract
+	getObject() *Contract
 }
 
 type ContractGetter interface {
@@ -41,10 +41,10 @@ type ContractsGetter interface {
 	getContractsByUser(user string) error
 }
 
-func (c Contract) getObject() Contract {
+func (c *Contract) getObject() *Contract {
 	return c
 }
-func (c Contract) addContract() bool {
+func (c *Contract) addContract() bool {
 	sqlStatement := `
 	INSERT INTO contract (clientname, clientgroup,allowedlimit, windowinminutes)
 	VALUES($1, $2,$3,$4)
@@ -60,7 +60,7 @@ func (c Contract) addContract() bool {
 	return true
 }
 
-func (c Contract) deleteContract() bool {
+func (c *Contract) deleteContract() bool {
 	sqlStatement := `DELETE FROM contract where contractid = $1`
 
 	_, err := library.GetDBConnection().Exec(sqlStatement, c.id)
@@ -73,7 +73,7 @@ func (c Contract) deleteContract() bool {
 	return true
 }
 
-func (c Contract) updateContract() bool {
+func (c *Contract) updateContract() bool {
 	sqlStatement := `
 	UPDATE contract SET clientname = $1, 
 	clientgroup = $2,
@@ -110,7 +110,7 @@ func (c *Contract) getContractByNameAndGroup(user string, group APIGroup) error 
 	}
 }
 
-func (c Contract) addAPI(apipath string) bool {
+func (c *Contract) addAPI(apipath string) bool {
 	sqlStatement := `
 	INSERT INTO api (api, contractid, clientgroup)
 	VALUES($1, $2,$3)
