@@ -73,7 +73,7 @@ func addApi(w http.ResponseWriter, r *http.Request) {
 		contract = new(registration.Contract)
 		err      error
 	)
-	err = registration.GetContractByNameAndGroup(contract, clientName, clientgroup)
+	*contract, err = registration.GetContractByNameAndGroup(contract, clientName, clientgroup)
 
 	if err != nil {
 		fmt.Fprintf(w, "No Contract found")

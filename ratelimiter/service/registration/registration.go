@@ -1,6 +1,9 @@
 package registration
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 func CreateContract(user string, group string, allowedRequest int64, window int16) *Contract {
 	var apigroup = APIGroup(group)
@@ -14,8 +17,14 @@ func CreateContract(user string, group string, allowedRequest int64, window int1
 	return c
 }
 
-func RegisterContract(c ContractCUD) bool {
+func RegisterContract(c ContractCRUD) bool {
 	contract := c.getObject()
+	existingContract, _ := c.getContractByNameAndGroup(contract.User, contract.Group)
+	fmt.Println(existingContract)
+	if existingContract.getObject().id != 0 {
+		log.Println("It seems to be duplicate contract")
+		return false
+	}
 	fmt.Printf("Register the user %s under the group %s with the limit %d per %d minute(s)\n", contract.User, contract.Group, contract.AllowedRequest, contract.Window)
 	return c.addContract()
 }
@@ -26,13 +35,13 @@ func GetContractByName(contracts ContractsGetter, user string) {
 	fmt.Println("contracts", contracts)
 }
 
-func GetContractByNameAndGroup(c ContractGetter, user string, group APIGroup) error {
+func GetContractByNameAndGroup(c ContractCRUD, user string, group APIGroup) (Contract, error) {
 
-	err := c.getContractByNameAndGroup(user, group)
+	contract, err := c.getContractByNameAndGroup(user, group)
 
-	return err
+	return *contract.getObject(), err
 }
 
-func AddApi(api string, contract ContractCUD) bool {
+func AddApi(api string, contract ContractCRUD) bool {
 	return contract.addAPI(api)
 }

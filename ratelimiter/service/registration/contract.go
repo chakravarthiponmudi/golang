@@ -24,18 +24,15 @@ type API struct {
 	apipath  string
 }
 
-type ContractCUD interface {
+type ContractCRUD interface {
 	addContract() bool
 	deleteContract() bool
 	updateContract() bool
 	addAPI(apipath string) bool
-
+	getContractByNameAndGroup(user string, group APIGroup) (ContractCRUD, error)
 	getObject() *Contract
 }
 
-type ContractGetter interface {
-	getContractByNameAndGroup(user string, group APIGroup) error
-}
 
 type ContractsGetter interface {
 	getContractsByUser(user string) error
@@ -92,21 +89,22 @@ func (c *Contract) updateContract() bool {
 	return true
 }
 
-func (c *Contract) getContractByNameAndGroup(user string, group APIGroup) error {
+func (cc *Contract) getContractByNameAndGroup(user string, group APIGroup) (ContractCRUD, error) {
 	sqlStatement := `
 	SELECT contractid, clientname, clientgroup,allowedlimit, windowinminutes FROM contract where clientname = $1 and clientgroup = $2
 	`
 
+	c := new(Contract)
 	row := library.GetDBConnection().QueryRow(sqlStatement, user, group)
 	switch err := row.Scan(&c.id, &c.User, &c.Group, &c.AllowedRequest, &c.Window); err {
 	case sql.ErrNoRows:
 		log.Println("No Rows found")
-		return err
+		return c, err
 	case nil:
-		return nil
+		return c, nil
 	default:
 		log.Panic("getContractByNameAndGroup", err)
-		return err
+		return c, err
 	}
 }
 
