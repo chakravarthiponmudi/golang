@@ -33,7 +33,6 @@ type ContractCRUD interface {
 	getObject() *Contract
 }
 
-
 type ContractsGetter interface {
 	getContractsByUser(user string) error
 }
@@ -89,6 +88,21 @@ func (c *Contract) updateContract() bool {
 	return true
 }
 
+func (c *Contract) addAPI(apipath string) bool {
+	sqlStatement := `
+	INSERT INTO api (api, contractid, clientgroup)
+	VALUES($1, $2,$3)
+	`
+	_, err := library.GetDBConnection().Exec(sqlStatement, apipath, c.id, c.Group)
+
+	if err != nil {
+		log.Println("Insertion of a contract failed", err)
+		return false
+	}
+
+	return true
+}
+
 func (cc *Contract) getContractByNameAndGroup(user string, group APIGroup) (ContractCRUD, error) {
 	sqlStatement := `
 	SELECT contractid, clientname, clientgroup,allowedlimit, windowinminutes FROM contract where clientname = $1 and clientgroup = $2
@@ -106,21 +120,6 @@ func (cc *Contract) getContractByNameAndGroup(user string, group APIGroup) (Cont
 		log.Panic("getContractByNameAndGroup", err)
 		return c, err
 	}
-}
-
-func (c *Contract) addAPI(apipath string) bool {
-	sqlStatement := `
-	INSERT INTO api (api, contractid, clientgroup)
-	VALUES($1, $2,$3)
-	`
-	_, err := library.GetDBConnection().Exec(sqlStatement, apipath, c.id, c.Group)
-
-	if err != nil {
-		log.Println("Insertion of a contract failed", err)
-		return false
-	}
-
-	return true
 }
 
 func (c *Contracts) getContractsByUser(user string) error {

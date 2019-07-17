@@ -20,7 +20,6 @@ func CreateContract(user string, group string, allowedRequest int64, window int1
 func RegisterContract(c ContractCRUD) bool {
 	contract := c.getObject()
 	existingContract, _ := c.getContractByNameAndGroup(contract.User, contract.Group)
-	fmt.Println(existingContract)
 	if existingContract.getObject().id != 0 {
 		log.Println("It seems to be duplicate contract")
 		return false

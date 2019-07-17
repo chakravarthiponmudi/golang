@@ -1,20 +1,23 @@
 package registration
 
 import (
-	"fmt"
 	"testing"
 )
 
+type compositeResult struct {
+	c ContractCRUD
+	e error
+}
+
 type mockContract struct {
+	testCase                        string
 	testdata                        Contract
 	addContractResult               bool
 	deleteContractResult            bool
 	updateContractResult            bool
 	addAPIResult                    bool
-	getContractByNameAndGroupResult struct {
-		c ContractCRUD
-		e error
-	}
+	getContractByNameAndGroupResult compositeResult
+	expectedResult                  bool
 }
 
 func (m *mockContract) addContract() bool {
@@ -34,7 +37,6 @@ func (m *mockContract) addAPI(apipath string) bool {
 }
 
 func (m *mockContract) getContractByNameAndGroup(user string, group APIGroup) (ContractCRUD, error) {
-	fmt.Println("calling mockedgetContractByNameAndGroup by", m)
 	return m.getContractByNameAndGroupResult.c, m.getContractByNameAndGroupResult.e
 }
 
@@ -43,13 +45,37 @@ func (m *mockContract) getObject() *Contract {
 }
 
 func TestRegisterContract(t *testing.T) {
-	var testContract = new(mockContract)
-	testContract.testdata = Contract{}
-	testContract.addContractResult = true
-	testContract.getContractByNameAndGroupResult.e = nil
-	testContract.getContractByNameAndGroupResult.c = &testContract.testdata
-	result := RegisterContract(testContract)
-	if !result {
-		t.Error(result)
+
+	var testContracts []mockContract
+	testContracts = []mockContract{
+		mockContract{
+			testCase:          "All data is fine",
+			testdata:          Contract{},
+			addContractResult: true,
+			getContractByNameAndGroupResult: compositeResult{
+				e: nil,
+				c: &Contract{},
+			},
+			expectedResult: true,
+		},
+		mockContract{
+			testCase:          "When a contract already exists",
+			testdata:          Contract{},
+			addContractResult: true,
+			getContractByNameAndGroupResult: compositeResult{
+				e: nil,
+				c: &Contract{
+					id: 1,
+				},
+			},
+			expectedResult: false,
+		},
+	}
+
+	for _, test := range testContracts {
+		actualResult := RegisterContract(&test)
+		if actualResult != test.expectedResult {
+			t.Error(test.testCase)
+		}
 	}
 }
