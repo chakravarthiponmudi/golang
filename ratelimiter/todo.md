@@ -21,15 +21,21 @@ I am now focusing on the registration side of the API.
 Created the database via docker and made a sure that the following are working
 
 I have the endpoints for adding the contract and the api's but with out proper error handling.
-# **Now i have to setup the error handling processing and also should focus on the test case writing**
+
+Now i have to setup the error handling processing and also should focus on the test case writing
 
 ```
  docker run -d -p 80:80 \
 -e "PGADMIN_DEFAULT_PASSWORD=password" \
 -e "PGADMIN_DEFAULT_EMAIL=chakravarthiponmudi@gmail.com" --net setup_infranet \dpage/pgadmin4
 bck-i-search: dpage_
-
 ```
+
+## 17-Jul-2019
+
+got a  working test case of registration module.
+
+Now i have to understand the db modules used, that returns the error codes and handle them properly in the registration module
 
 # Tools and other Details
 ### golang dep

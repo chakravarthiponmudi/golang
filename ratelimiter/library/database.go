@@ -10,7 +10,7 @@ import (
 
 const (
 	host     = "localhost"
-	port     = 15432
+	port     = 25432
 	user     = "local"
 	password = "local@007"
 	dbname   = "ratelimiter"

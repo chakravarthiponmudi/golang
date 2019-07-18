@@ -79,3 +79,39 @@ func TestRegisterContract(t *testing.T) {
 		}
 	}
 }
+
+func TestAddAPI(t *testing.T) {
+
+	var testContracts []mockContract
+	testContracts = []mockContract{
+		mockContract{
+			testCase:     "All data is fine",
+			testdata:     Contract{},
+			addAPIResult: true,
+			getContractByNameAndGroupResult: compositeResult{
+				e: nil,
+				c: &Contract{},
+			},
+			expectedResult: true,
+		},
+		mockContract{
+			testCase:     "When a API for a contract and group already exists",
+			testdata:     Contract{},
+			addAPIResult: false,
+			getContractByNameAndGroupResult: compositeResult{
+				e: nil,
+				c: &Contract{
+					id: 1,
+				},
+			},
+			expectedResult: false,
+		},
+	}
+
+	for _, test := range testContracts {
+		actualResult := AddApi("/test/path", &test)
+		if actualResult != test.expectedResult {
+			t.Error(test.testCase)
+		}
+	}
+}

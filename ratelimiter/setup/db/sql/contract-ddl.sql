@@ -1,9 +1,10 @@
 CREATE TABLE contract (
-    contractid  bigserial PRIMARY KEY,
+    contractid  bigserial,
     clientname        varchar(100),
     clientgroup       varchar(100),
     allowedlimit integer,
-    windowinminutes integer
+    windowinminutes integer,
+    PRIMARY KEY(clientname, clientgroup)
 );
 
 CREATE TABLE api (
