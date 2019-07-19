@@ -1,8 +1,9 @@
 package registration
 
 import (
-	"fmt"
 	"log"
+
+	"github.com/lib/pq"
 )
 
 func CreateContract(user string, group string, allowedRequest int64, window int16) *Contract {
@@ -24,14 +25,19 @@ func RegisterContract(c ContractCRUD) bool {
 		log.Println("It seems to be duplicate contract")
 		return false
 	}
-	fmt.Printf("Register the user %s under the group %s with the limit %d per %d minute(s)\n", contract.User, contract.Group, contract.AllowedRequest, contract.Window)
-	return c.addContract()
+	log.Printf("Register the user %s under the group %s with the limit %d per %d minute(s)\n", contract.User, contract.Group, contract.AllowedRequest, contract.Window)
+	err := c.addContract()
+	if err != nil {
+		log.Println("Adding new contract failed. ", err.Error())
+		return false
+	}
+	return true
 }
 
 func GetContractByName(contracts ContractsGetter, user string) {
 
 	contracts.getContractsByUser(user)
-	fmt.Println("contracts", contracts)
+	log.Println("contracts", contracts)
 }
 
 func GetContractByNameAndGroup(c ContractCRUD, user string, group APIGroup) (Contract, error) {
@@ -42,5 +48,13 @@ func GetContractByNameAndGroup(c ContractCRUD, user string, group APIGroup) (Con
 }
 
 func AddApi(api string, contract ContractCRUD) bool {
-	return contract.addAPI(api)
+	err := contract.addAPI(api)
+	if err, ok := err.(*pq.Error); ok {
+		log.Println("pq error:", err.Code.Name())
+	}
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
 }

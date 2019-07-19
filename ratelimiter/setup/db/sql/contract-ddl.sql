@@ -1,5 +1,5 @@
 CREATE TABLE contract (
-    contractid  bigserial,
+    contractid  bigserial UNIQUE,
     clientname        varchar(100),
     clientgroup       varchar(100),
     allowedlimit integer,
@@ -8,8 +8,9 @@ CREATE TABLE contract (
 );
 
 CREATE TABLE api (
-    id bigserial PRIMARY KEY,
+    id bigserial UNIQUE,
     api varchar(2400),
     contractid bigserial references contract(contractid),
-    clientgroup varchar(100)
+    clientgroup varchar(100),
+    PRIMARY KEY(contractid, api)
 );

@@ -1,0 +1,181 @@
+{
+	"info": {
+		"_postman_id": "57a3e06f-8f8c-4775-b284-0719263ea311",
+		"name": "ratelimiter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "AddAPI",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "clientname",
+							"value": "Access",
+							"type": "text"
+						},
+						{
+							"key": "clientgroup",
+							"value": "view",
+							"type": "text"
+						},
+						{
+							"key": "path",
+							"value": "/user/check",
+							"type": "text"
+						},
+						{
+							"key": "window",
+							"value": "10",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "API",
+							"value": "/user/check",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getusercontract",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "Athena",
+							"type": "text"
+						},
+						{
+							"key": "group",
+							"value": "edit",
+							"type": "text"
+						},
+						{
+							"key": "allowedRequest",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "window",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "API",
+							"value": "/user/check",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/contract/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contract",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addcontract",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "group",
+							"value": "view",
+							"type": "text"
+						},
+						{
+							"key": "allowedRequest",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "window",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "API",
+							"value": "/user/check",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "user",
+							"value": "Access",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/contract",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contract"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

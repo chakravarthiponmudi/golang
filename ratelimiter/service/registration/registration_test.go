@@ -2,6 +2,8 @@ package registration
 
 import (
 	"testing"
+
+	"github.com/lib/pq"
 )
 
 type compositeResult struct {
@@ -12,15 +14,15 @@ type compositeResult struct {
 type mockContract struct {
 	testCase                        string
 	testdata                        Contract
-	addContractResult               bool
+	addContractResult               error
 	deleteContractResult            bool
 	updateContractResult            bool
-	addAPIResult                    bool
+	addAPIResult                    error
 	getContractByNameAndGroupResult compositeResult
 	expectedResult                  bool
 }
 
-func (m *mockContract) addContract() bool {
+func (m *mockContract) addContract() error {
 	return m.addContractResult
 }
 
@@ -32,7 +34,7 @@ func (m *mockContract) updateContract() bool {
 	return m.updateContractResult
 }
 
-func (m *mockContract) addAPI(apipath string) bool {
+func (m *mockContract) addAPI(apipath string) error {
 	return m.addAPIResult
 }
 
@@ -51,7 +53,7 @@ func TestRegisterContract(t *testing.T) {
 		mockContract{
 			testCase:          "All data is fine",
 			testdata:          Contract{},
-			addContractResult: true,
+			addContractResult: nil,
 			getContractByNameAndGroupResult: compositeResult{
 				e: nil,
 				c: &Contract{},
@@ -61,7 +63,7 @@ func TestRegisterContract(t *testing.T) {
 		mockContract{
 			testCase:          "When a contract already exists",
 			testdata:          Contract{},
-			addContractResult: true,
+			addContractResult: nil,
 			getContractByNameAndGroupResult: compositeResult{
 				e: nil,
 				c: &Contract{
@@ -87,7 +89,7 @@ func TestAddAPI(t *testing.T) {
 		mockContract{
 			testCase:     "All data is fine",
 			testdata:     Contract{},
-			addAPIResult: true,
+			addAPIResult: nil,
 			getContractByNameAndGroupResult: compositeResult{
 				e: nil,
 				c: &Contract{},
@@ -97,7 +99,7 @@ func TestAddAPI(t *testing.T) {
 		mockContract{
 			testCase:     "When a API for a contract and group already exists",
 			testdata:     Contract{},
-			addAPIResult: false,
+			addAPIResult: pq.Error{},
 			getContractByNameAndGroupResult: compositeResult{
 				e: nil,
 				c: &Contract{

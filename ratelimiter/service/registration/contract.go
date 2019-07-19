@@ -25,10 +25,10 @@ type API struct {
 }
 
 type ContractCRUD interface {
-	addContract() bool
+	addContract() error
 	deleteContract() bool
 	updateContract() bool
-	addAPI(apipath string) bool
+	addAPI(apipath string) error
 	getContractByNameAndGroup(user string, group APIGroup) (ContractCRUD, error)
 	getObject() *Contract
 }
@@ -40,7 +40,7 @@ type ContractsGetter interface {
 func (c *Contract) getObject() *Contract {
 	return c
 }
-func (c *Contract) addContract() bool {
+func (c *Contract) addContract() error {
 	sqlStatement := `
 	INSERT INTO contract (clientname, clientgroup,allowedlimit, windowinminutes)
 	VALUES($1, $2,$3,$4)
@@ -48,12 +48,7 @@ func (c *Contract) addContract() bool {
 
 	_, err := library.GetDBConnection().Exec(sqlStatement, c.User, c.Group, c.AllowedRequest, c.Window)
 
-	if err != nil {
-		log.Println("Insertion of a contract failed", err)
-		return false
-	}
-
-	return true
+	return err
 }
 
 func (c *Contract) deleteContract() bool {
@@ -88,19 +83,14 @@ func (c *Contract) updateContract() bool {
 	return true
 }
 
-func (c *Contract) addAPI(apipath string) bool {
+func (c *Contract) addAPI(apipath string) error {
 	sqlStatement := `
 	INSERT INTO api (api, contractid, clientgroup)
 	VALUES($1, $2,$3)
 	`
 	_, err := library.GetDBConnection().Exec(sqlStatement, apipath, c.id, c.Group)
 
-	if err != nil {
-		log.Println("Insertion of a contract failed", err)
-		return false
-	}
-
-	return true
+	return err
 }
 
 func (cc *Contract) getContractByNameAndGroup(user string, group APIGroup) (ContractCRUD, error) {
