@@ -48,3 +48,16 @@ gorc is a command that helps running the go test command recursively inside the 
 ###TESTIFY
 
 Testify is a like MOCHA. which allows you to do some tearup and teardown.... good to have feature.
+
+#Commands
+
+```
+CompileDaemon --exclude-dir=./setup --directory=/home/chakra/go/src/github.com/chakra/ratelimiter --command='./ratelimiter'
+```
+
+```
+ docker run -d -p 80:80 \
+-e "PGADMIN_DEFAULT_PASSWORD=password" \
+-e "PGADMIN_DEFAULT_EMAIL=chakravarthiponmudi@gmail.com" --net setup_infranet \dpage/pgadmin4
+bck-i-search: dpage_
+```
