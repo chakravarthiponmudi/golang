@@ -3,8 +3,9 @@ package controller
 import "github.com/chakra/ratelimiter/service/registration"
 
 //CheckAPI Function to validate the request on the throttle limit
-func CheckAPI(url string) bool {
-	return true
+func CheckAPI(client string, api string) bool {
+	// return throttler.CheckAPI()
+	return false
 }
 
 func buildContract() *registration.Contract {

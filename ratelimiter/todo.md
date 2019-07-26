@@ -36,7 +36,9 @@ bck-i-search: dpage_
 got a  working test case of registration module.
 
 Now i have to understand the db modules used, that returns the error codes and handle them properly in the registration module
-
+## 25-Jul-2019
+adding the code for throttler... Just started with the basic in memory implementation.
+I have read through some details on redis, and seems to be more appropriate candidate.
 # Tools and other Details
 ### golang dep
 

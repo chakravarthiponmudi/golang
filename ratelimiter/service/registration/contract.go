@@ -30,6 +30,7 @@ type ContractCRUD interface {
 	updateContract() bool
 	addAPI(apipath string) error
 	getContractByNameAndGroup(user string, group APIGroup) (ContractCRUD, error)
+	getContractByNameAndPath(user string, apipath string) (ContractCRUD, error)
 	getObject() *Contract
 }
 
@@ -100,6 +101,27 @@ func (cc *Contract) getContractByNameAndGroup(user string, group APIGroup) (Cont
 
 	c := new(Contract)
 	row := library.GetDBConnection().QueryRow(sqlStatement, user, group)
+	switch err := row.Scan(&c.id, &c.User, &c.Group, &c.AllowedRequest, &c.Window); err {
+	case sql.ErrNoRows:
+		log.Println("No Rows found")
+		return c, err
+	case nil:
+		return c, nil
+	default:
+		log.Panic("getContractByNameAndGroup", err)
+		return c, err
+	}
+}
+
+func (c *Contract) getContractByNameAndPath(user string, apipath string) (ContractCRUD, error) {
+
+	sqlStatement := `
+	SELECT c.contractid,clientname, clientgroup, c.allowedlimit, c.windowinminutes FROM contract c, api a where c.clientname = $1 
+	AND a.api = $2 and a.contractid = c.contractid
+	`
+	//TODO: check that only one row exists, multiple rows are not allowed. this means a single api for a single
+	//client has multiple contracts, which cannot be true
+	row := library.GetDBConnection().QueryRow(sqlStatement, user, apipath)
 	switch err := row.Scan(&c.id, &c.User, &c.Group, &c.AllowedRequest, &c.Window); err {
 	case sql.ErrNoRows:
 		log.Println("No Rows found")

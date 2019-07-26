@@ -47,6 +47,13 @@ func GetContractByNameAndGroup(c ContractCRUD, user string, group APIGroup) (Con
 	return *contract.getObject(), err
 }
 
+func GetContractByNameAndPath(c ContractCRUD, user string, apipath string) (Contract, error) {
+
+	contract, err := c.getContractByNameAndPath(user, apipath)
+
+	return *contract.getObject(), err
+}
+
 func AddApi(api string, contract ContractCRUD) bool {
 	err := contract.addAPI(api)
 	if err, ok := err.(*pq.Error); ok {

@@ -15,7 +15,7 @@ import (
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(time.Millisecond * 20)
-	if controller.CheckAPI(r.URL.Path) {
+	if controller.CheckAPI("Athena", r.URL.Path) {
 		fmt.Fprintf(w, "%s is allowed", r.URL.Path[1:])
 	} else {
 		fmt.Fprintf(w, "%s is denied", r.URL.Path[1:])
