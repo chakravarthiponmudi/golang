@@ -37,19 +37,19 @@ func createList(node *Node, listSize int16, tailNode **Node) *Node {
 		newNode.nextNode = createList(newNode, listSize-1, tailNode)
 	}
 	if listSize == 1 {
-		fmt.Println("Tila node is set")
 		*tailNode = newNode
 	}
 
 	return newNode
 }
 
-func CreateWindow(numberOfSlots int16, slotDuration time.Duration) *Window {
+func CreateWindow(numberOfSlots int16, slotDuration time.Duration, allowedLimit int64) *Window {
 	window := Window{
 		windowCount:               0,
 		windowSlot:                numberOfSlots,
 		slotDuration:              slotDuration,
 		lastSlotCreationTimeStamp: time.Now(),
+		allowedLimit:              allowedLimit,
 	}
 
 	var rootNode = &Node{
@@ -65,7 +65,6 @@ func CreateWindow(numberOfSlots int16, slotDuration time.Duration) *Window {
 }
 
 func addNode(window *Window) *Window {
-	window.print()
 	window.windowCount = window.windowCount + window.head.counter - window.tail.counter
 	window.tail.prevNode.nextNode = nil
 	window.tail = window.tail.prevNode
@@ -101,7 +100,6 @@ func (w *Window) isLimitExceeded() bool {
 		if duration%w.slotDuration > 0 {
 			nodesToAdd++
 		}
-		log.Println("nodes to add", int64(nodesToAdd))
 		//TODO: Scope for performance improvement here. We can even  add multiple nodes in a single shot...
 		for i := 0; i <= int(nodesToAdd); i++ {
 			addNode(w)
@@ -110,9 +108,10 @@ func (w *Window) isLimitExceeded() bool {
 	w.lastSlotCreationTimeStamp = currentTime
 	if GetCurrentLimit(w) > w.allowedLimit {
 		result = false
+	} else {
+		incr(w.head)
+		result = true
 	}
-	incr(w.head)
-	result = true
 	w.wmux.Unlock()
 
 	return result

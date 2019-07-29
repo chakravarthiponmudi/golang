@@ -39,6 +39,15 @@ Now i have to understand the db modules used, that returns the error codes and h
 ## 25-Jul-2019
 adding the code for throttler... Just started with the basic in memory implementation.
 I have read through some details on redis, and seems to be more appropriate candidate.
+
+## 26-Jul-2019
+I implemented a basic slider logic in golang. it seems to be working fine. what are the drawbacks
+Non-HA
+Not-Scalable
+why becuase it is in memory
+
+## 27-jul-2019
+
 # Tools and other Details
 ### golang dep
 

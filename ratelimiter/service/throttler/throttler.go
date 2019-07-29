@@ -8,8 +8,8 @@ import (
 
 //TODO: api path are to compare as a regex , becuase that's what is going to be in realtime..
 func getContract(client string, api string) (registration.Contract, error) {
-	var contractCRUD *registration.Contract
-	contract, err := registration.GetContractByNameAndPath(contractCRUD, client, api)
+
+	contract, err := registration.GetContractByNameAndPath(new(registration.Contract), client, api)
 	if err != nil {
 		log.Println("getContract failed while fetching for ", client, "and path ", api)
 	}
