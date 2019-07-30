@@ -90,7 +90,7 @@ func incr(node *Node) int64 {
 	return val
 }
 
-func (w *Window) isLimitExceeded() bool {
+func (w *Window) IsLimitExceeded() bool {
 	result := false
 	w.wmux.Lock()
 	currentTime := time.Now()
