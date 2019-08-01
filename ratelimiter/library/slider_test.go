@@ -1,54 +1,36 @@
 package library
 
 import (
-	"sync"
+	"log"
 	"testing"
 	"time"
 )
 
-type counter struct {
-	allowed int
-	blocked int
-	mux     sync.Mutex
-}
-
-var result counter
-
-var wg sync.WaitGroup
-
-func TestSlider(t *testing.T) {
-	result.allowed = 0
-	result.blocked = 0
-
-	testsize := 100000000
-
-	wg.Add(testsize)
-	testWindow := CreateWindow(1000, 1*time.Millisecond, 500000)
-	for i := 0; i < testsize; i++ {
-		go hitTesting(testWindow, t, i)
-		if i%100000 == 0 {
-			time.Sleep(1 * time.Millisecond)
-		}
-
-	}
-	wg.Wait()
+func TestSider(t *testing.T) {
+	t.Log("Testing")
+	testWindow := CreateWindow(10, 1*time.Second)
+	t.Log(testWindow)
+	hitTesting(testWindow)
 	testWindow.print()
-	t.Log("allowed", result.allowed)
-	t.Log("blocked", result.blocked)
-	t.Log("Total", result.allowed+result.blocked)
+	hitTesting(testWindow)
+	testWindow.print()
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	time.Sleep(5 * time.Second)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	hitTesting(testWindow)
+	testWindow.print()
 }
 
-func hitTesting(w *Window, t *testing.T, i int) {
-	if w.isLimitExceeded() {
-		result.mux.Lock()
-		result.allowed++
-		result.mux.Unlock()
-	} else {
-		result.mux.Lock()
-		result.blocked++
-		result.mux.Unlock()
-
-	}
-
-	wg.Done()
+func hitTesting(w *Window) bool {
+	log.Println("Hitinng API")
+	return w.isLimitExceeded()
 }
