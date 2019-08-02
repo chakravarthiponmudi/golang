@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type grid int16
 type blockLocation int8
@@ -9,6 +11,8 @@ const gridsize = 9
 const maxCellValue = 9
 const blocksize = 3
 const cubesize = 81
+
+var cellvalues = []int8{1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 func getRow(index grid) grid {
 	lIndex := index + 1 //offset adjuster
@@ -135,6 +139,14 @@ func guessValue(g int8) int8 {
 
 var solutionFound = false
 
+func cloneSolution(s solution) solution {
+	cloneSol := solution{}
+	cloneSol.elems = make([]node, cap(s.elems))
+	for i, v := range s.elems {
+		cloneSol.elems[i] = v
+	}
+	return cloneSol
+}
 func solveSudoku(s *solution, index grid, guess int8) {
 
 	// printSolution(s)
@@ -162,6 +174,38 @@ func solveSudoku(s *solution, index grid, guess int8) {
 	}
 }
 
+func chooseValue(s solution, index grid) {
+
+	printSolution(&s)
+	fmt.Println(":@:", index)
+	if solutionFound {
+		return
+	}
+	if s.elems[index].fixed {
+		//a new function to be called
+		cloneSol := cloneSolution(s)
+		chooseValue(cloneSol, index+1)
+		return
+	}
+
+	for _, v := range cellvalues {
+		s.elems[index].value = v
+		if BoundingFunction(s.elems[index], s.elems) {
+			if index == cubesize-1 {
+				solutionFound = true
+				printSolution(&s)
+			}
+			cloneSol := cloneSolution(s)
+			chooseValue(cloneSol, index+1)
+		}
+		if solutionFound {
+			break
+		}
+	}
+	return
+
+}
+
 func createSolution() *solution {
 	sol := new(solution)
 	sol.elems = make([]node, cubesize)
@@ -173,6 +217,45 @@ func createSolution() *solution {
 
 	return sol
 
+}
+
+var prefillValue map[grid]int8
+
+func getPrefillSolution() {
+	prefillValue = make(map[grid]int8)
+	prefillValue[6] = 3
+	prefillValue[8] = 7
+	prefillValue[9] = 9
+	prefillValue[15] = 5
+	prefillValue[16] = 1
+	prefillValue[17] = 4
+	prefillValue[18] = 3
+	prefillValue[20] = 4
+	prefillValue[22] = 1
+	prefillValue[23] = 6
+	prefillValue[25] = 2
+	prefillValue[29] = 6
+	prefillValue[34] = 5
+	prefillValue[36] = 2
+	prefillValue[41] = 4
+	prefillValue[50] = 9
+	prefillValue[51] = 4
+	prefillValue[56] = 1
+	prefillValue[57] = 9
+	prefillValue[61] = 7
+	prefillValue[62] = 6
+	prefillValue[70] = 3
+	prefillValue[74] = 7
+	prefillValue[75] = 6
+	prefillValue[80] = 5
+
+}
+
+func populateSolution(s *solution) {
+	for k, v := range prefillValue {
+		s.elems[k].fixed = true
+		s.elems[k].value = v
+	}
 }
 
 func main() {
@@ -188,6 +271,9 @@ func main() {
 	// fmt.Println(rowToIndexMap)
 	// fmt.Println(columnToIndexMap)
 	sol := createSolution()
-	// printSolution(sol)
-	solveSudoku(sol, 0, 1)
+	getPrefillSolution()
+	populateSolution(sol)
+	printSolution(sol)
+	// solveSudoku(sol, 0, 1)
+	chooseValue(*sol, 0)
 }
