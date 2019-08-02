@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
 
 type grid int16
@@ -128,7 +129,11 @@ func printSolution(s *solution) {
 		if i%gridsize == 0 {
 			fmt.Println()
 		}
-		fmt.Printf("\t%d", n.value)
+		if n.value == -1 {
+			fmt.Print("\t_")
+		} else {
+			fmt.Printf("\t%d", n.value)
+		}
 	}
 	fmt.Println()
 }
@@ -147,44 +152,41 @@ func cloneSolution(s solution) solution {
 	}
 	return cloneSol
 }
-func solveSudoku(s *solution, index grid, guess int8) {
 
-	// printSolution(s)
-	if s.elems[index].fixed {
-		solveSudoku(s, index+1, 1)
-		return
-	}
-	s.elems[index].value = guess
-	if BoundingFunction(s.elems[index], s.elems) {
-		fmt.Printf("\nindex %d, guess %d\n", index, guess)
-		if index == cubesize-1 {
-			solutionFound = true
-			printSolution(s)
-		} else {
-			for i := 1; i <= maxCellValue && !solutionFound; i++ {
-				solveSudoku(s, index+1, int8(i))
-			}
-		}
-	} else {
-		if guess == maxCellValue {
-			s.elems[index].value = -1
-		} else {
-			solveSudoku(s, index, guessValue(guess))
-		}
-	}
-}
+var goroutineCounter int
+var printcounter int
+var mutex sync.Mutex
+var threads = 16
+var parallelThread grid = 0
 
 func chooseValue(s solution, index grid) {
 
-	printSolution(&s)
-	fmt.Println(":@:", index)
+	if goroutineCounter < threads && index > parallelThread {
+		mutex.Lock()
+		goroutineCounter++
+		mutex.Unlock()
+	}
+
+	printcounter++
+	if printcounter%1000000 == 0 {
+		printcounter = 0
+		printSolution(&s)
+	}
+
+	// printSolution(&s)
+	// fmt.Println(":@:", index)
 	if solutionFound {
 		return
 	}
 	if s.elems[index].fixed {
 		//a new function to be called
+		if index == cubesize-1 {
+			solutionFound = true
+			printSolution(&s)
+			waitgroup.Done()
+		}
 		cloneSol := cloneSolution(s)
-		chooseValue(cloneSol, index+1)
+		go chooseValue(cloneSol, index+1)
 		return
 	}
 
@@ -194,9 +196,14 @@ func chooseValue(s solution, index grid) {
 			if index == cubesize-1 {
 				solutionFound = true
 				printSolution(&s)
+				waitgroup.Done()
 			}
 			cloneSol := cloneSolution(s)
-			chooseValue(cloneSol, index+1)
+			if (goroutineCounter < threads) && (index > parallelThread) {
+				go chooseValue(cloneSol, index+1)
+			} else {
+				chooseValue(cloneSol, index+1)
+			}
 		}
 		if solutionFound {
 			break
@@ -258,7 +265,11 @@ func populateSolution(s *solution) {
 	}
 }
 
+var waitgroup sync.WaitGroup
+
 func main() {
+
+	waitgroup.Add(1)
 	indexToBlockMap = make(map[grid]blockLocation)
 	blockToIndexes = make(map[blockLocation][]grid)
 	rowToIndexMap = make(map[grid][]grid)
@@ -274,6 +285,7 @@ func main() {
 	getPrefillSolution()
 	populateSolution(sol)
 	printSolution(sol)
-	// solveSudoku(sol, 0, 1)
 	chooseValue(*sol, 0)
+	// fmt.Println("Waiting for the go routines to complete")
+	waitgroup.Wait()
 }
