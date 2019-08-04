@@ -230,31 +230,29 @@ var prefillValue map[grid]int8
 
 func getPrefillSolution() {
 	prefillValue = make(map[grid]int8)
-	prefillValue[6] = 3
-	prefillValue[8] = 7
-	prefillValue[9] = 9
-	prefillValue[15] = 5
-	prefillValue[16] = 1
-	prefillValue[17] = 4
-	prefillValue[18] = 3
-	prefillValue[20] = 4
+	prefillValue[0] = 5
+	prefillValue[5] = 4
+	prefillValue[7] = 7
+	prefillValue[8] = 2
+	prefillValue[21] = 6
 	prefillValue[22] = 1
-	prefillValue[23] = 6
-	prefillValue[25] = 2
-	prefillValue[29] = 6
-	prefillValue[34] = 5
-	prefillValue[36] = 2
-	prefillValue[41] = 4
-	prefillValue[50] = 9
-	prefillValue[51] = 4
-	prefillValue[56] = 1
-	prefillValue[57] = 9
-	prefillValue[61] = 7
-	prefillValue[62] = 6
-	prefillValue[70] = 3
-	prefillValue[74] = 7
-	prefillValue[75] = 6
-	prefillValue[80] = 5
+	prefillValue[23] = 3
+	prefillValue[30] = 3
+	prefillValue[31] = 7
+	prefillValue[32] = 8
+	prefillValue[39] = 4
+	prefillValue[43] = 6
+	prefillValue[44] = 3
+	prefillValue[47] = 4
+	prefillValue[51] = 9
+	prefillValue[55] = 9
+	prefillValue[56] = 6
+	prefillValue[60] = 1
+	prefillValue[71] = 4
+	prefillValue[73] = 1
+	prefillValue[77] = 5
+	prefillValue[78] = 3
+	prefillValue[79] = 9
 
 }
 
@@ -282,8 +280,8 @@ func main() {
 	// fmt.Println(rowToIndexMap)
 	// fmt.Println(columnToIndexMap)
 	sol := createSolution()
-	getPrefillSolution()
-	populateSolution(sol)
+	// getPrefillSolution()
+	// populateSolution(sol)
 	printSolution(sol)
 	chooseValue(*sol, 0)
 	// fmt.Println("Waiting for the go routines to complete")
