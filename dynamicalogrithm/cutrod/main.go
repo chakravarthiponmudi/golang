@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func topDownCutrod(rodLength int, price []int, r []int, s []int) int {
+func topDownCutrod(rodLength int, price []int, r []int, s []int, c int) int {
 
 	if rodLength == 0 {
 		return 0
@@ -21,7 +21,10 @@ func topDownCutrod(rodLength int, price []int, r []int, s []int) int {
 
 	q := -1
 	for i := 1; i <= rodLength; i++ {
-		value := price[i-1] + topDownCutrod(rodLength-i, price, r, s)
+		value := price[i-1] + topDownCutrod(rodLength-i, price, r, s, c)
+		if i < rodLength {
+			value = value - c
+		}
 		if q < value {
 			q = value
 			r[rodLength-1] = q
@@ -64,6 +67,7 @@ func main() {
 	}
 
 	price := generatePrice(lengthOfRod)
-	fmt.Println(topDownCutrod(lengthOfRod, price, revenue, sizes))
+	cuttingCost, _ := strconv.Atoi(os.Args[2])
+	fmt.Println(topDownCutrod(lengthOfRod, price, revenue, sizes, cuttingCost))
 	printSizes(sizes, lengthOfRod, price)
 }
