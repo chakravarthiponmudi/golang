@@ -14,8 +14,16 @@ type matrix struct {
 	col int
 }
 
-func generateMatrixDimensions(chainSize int) []matrix {
+type pmat struct {
+	i int
+	j int
+}
+
+type _p = map[pmat]matrix
+
+func generateMatrixDimensions(chainSize int) ([]matrix, _p) {
 	matrixDimensions := make([]matrix, chainSize)
+	p := make(map[pmat]matrix)
 	generator := rand.New(rand.NewSource(92311))
 	seed := chainSize
 	matrixDimensions[0].row = generator.Intn(seed) + 1
@@ -26,12 +34,24 @@ func generateMatrixDimensions(chainSize int) []matrix {
 			matrixDimensions[i+1].row = matrixDimensions[i].col
 		}
 	}
-	return matrixDimensions
+	for i, mat := range matrixDimensions {
+		p[pmat{i, i}] = mat
+	}
+	return matrixDimensions, p
 }
 
 type dArray = []int
 
-func matrixChainMultiplication(p []matrix, n int) {
+func calculateP(mat1 matrix, mat2 matrix) (int, *matrix) {
+	cost := mat1.row * mat1.col * mat2.col
+	mat := new(matrix)
+	mat.row = mat1.row
+	mat.col = mat2.col
+
+	return cost, mat
+}
+
+func matrixChainMultiplication(p _p, n int) {
 	m := make([]dArray, n)
 	s := make([]dArray, n)
 	for i := range m {
@@ -39,12 +59,14 @@ func matrixChainMultiplication(p []matrix, n int) {
 		s[i] = make([]int, n)
 	}
 
-	for l := 2; l < n; l++ {
-		for i := 0; i < n-l; i++ {
+	for l := 2; l <= n; l++ {
+		for i := 0; i <= n-l; i++ {
 			j := i + l - 1
 			m[i][j] = math.MaxUint32
-			for k := i; k < j-1; k++ {
-				q := m[i][k] + m[k+1][j] //+ ???
+			for k := i; k < j; k++ {
+				cost, mat := calculateP(p[pmat{i, k}], p[pmat{k + 1, j}])
+				q := m[i][k] + m[k+1][j] + cost
+				p[pmat{i, j}] = *mat
 				if q < m[i][j] {
 					m[i][j] = q
 					s[i][j] = k
@@ -52,6 +74,10 @@ func matrixChainMultiplication(p []matrix, n int) {
 			}
 		}
 	}
+
+	fmt.Println(m)
+	fmt.Println(s)
+	fmt.Println(p)
 
 }
 
@@ -61,7 +87,7 @@ func main() {
 		log.Panic("Error in Chain length", err)
 	}
 
-	p := generateMatrixDimensions(chainLength)
+	_, p := generateMatrixDimensions(chainLength)
 	fmt.Println(p)
 
 	matrixChainMultiplication(p, chainLength)
