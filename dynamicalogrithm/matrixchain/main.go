@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"os"
 	"strconv"
@@ -30,17 +31,28 @@ func generateMatrixDimensions(chainSize int) []matrix {
 
 type dArray = []int
 
-func matrixChainMultiplication(p []matrix, length int) {
-	m := make([]dArray, length)
-	s := make([]dArray, length)
+func matrixChainMultiplication(p []matrix, n int) {
+	m := make([]dArray, n)
+	s := make([]dArray, n)
 	for i := range m {
-		m[i] = make([]int, length)
-		s[i] = make([]int, length)
+		m[i] = make([]int, n)
+		s[i] = make([]int, n)
 	}
 
-	for i := 0; i < length; i++ {
-		m[i][i] = 0
+	for l := 2; l < n; l++ {
+		for i := 0; i < n-l; i++ {
+			j := i + l - 1
+			m[i][j] = math.MaxUint32
+			for k := i; k < j-1; k++ {
+				q := m[i][k] + m[k+1][j] //+ ???
+				if q < m[i][j] {
+					m[i][j] = q
+					s[i][j] = k
+				}
+			}
+		}
 	}
+
 }
 
 func main() {
