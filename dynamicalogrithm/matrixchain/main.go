@@ -42,16 +42,20 @@ func generateMatrixDimensions(chainSize int) ([]matrix, _p) {
 
 type dArray = []int
 
-func calculateP(mat1 matrix, mat2 matrix) (int, *matrix) {
+func calculateP(res bool, mat1 matrix, mat2 matrix) (int, *matrix) {
 	cost := mat1.row * mat1.col * mat2.col
-	mat := new(matrix)
-	mat.row = mat1.row
-	mat.col = mat2.col
+	if !res {
+		mat := new(matrix)
+		mat.row = mat1.row
+		mat.col = mat2.col
+		return cost, mat
+	}
 
-	return cost, mat
+	return cost, new(matrix)
+
 }
 
-func matrixChainMultiplication(p _p, n int) {
+func matrixChainMultiplication(p _p, n int) []dArray {
 	m := make([]dArray, n)
 	s := make([]dArray, n)
 	for i := range m {
@@ -64,9 +68,12 @@ func matrixChainMultiplication(p _p, n int) {
 			j := i + l - 1
 			m[i][j] = math.MaxUint32
 			for k := i; k < j; k++ {
-				cost, mat := calculateP(p[pmat{i, k}], p[pmat{k + 1, j}])
+				_, ok := p[pmat{i, j}]
+				cost, mat := calculateP(ok, p[pmat{i, k}], p[pmat{k + 1, j}])
 				q := m[i][k] + m[k+1][j] + cost
-				p[pmat{i, j}] = *mat
+				if !ok {
+					p[pmat{i, j}] = *mat
+				}
 				if q < m[i][j] {
 					m[i][j] = q
 					s[i][j] = k
@@ -75,9 +82,22 @@ func matrixChainMultiplication(p _p, n int) {
 		}
 	}
 
-	fmt.Println(m)
-	fmt.Println(s)
-	fmt.Println(p)
+	// fmt.Println(m)
+	// fmt.Println(s)
+	// fmt.Println(p)
+	return s
+
+}
+
+func printSolution(s []dArray, i int, j int) {
+	if i == j {
+		fmt.Printf("A%d", i)
+	} else {
+		fmt.Printf("(")
+		printSolution(s, i, s[i][j])
+		printSolution(s, s[i][j]+1, j)
+		fmt.Printf(")")
+	}
 
 }
 
@@ -87,8 +107,10 @@ func main() {
 		log.Panic("Error in Chain length", err)
 	}
 
-	_, p := generateMatrixDimensions(chainLength)
+	mat, p := generateMatrixDimensions(chainLength)
 	fmt.Println(p)
 
-	matrixChainMultiplication(p, chainLength)
+	s := matrixChainMultiplication(p, chainLength)
+	fmt.Println(mat)
+	printSolution(s, 0, chainLength-1)
 }
